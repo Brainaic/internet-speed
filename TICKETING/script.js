@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function loadEvents() {
-    fetch('TICKETING//events.json')
+    fetch('TICKETING/events.json')
         .then(response => response.json())
         .then(events => {
             const eventContainer = document.querySelector('.events-container');
