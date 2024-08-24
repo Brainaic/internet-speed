@@ -1,47 +1,3 @@
-function purchaseTicket(eventName, price) {
-    const ticket = {
-        event: eventName,
-        price: price,
-        date: new Date().toLocaleString(),
-        ticketId: generateTicketId()
-    };
-    
-    localStorage.setItem('ticket', JSON.stringify(ticket));
-    window.location.href = 'ticket.html';
-}
-
-function generateTicketId() {
-    return 'TCKT-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-}
-
-function displayTicket() {
-    const ticket = JSON.parse(localStorage.getItem('ticket'));
-
-    if (ticket) {
-        document.getElementById('event-name').innerText = ticket.event;
-        document.getElementById('event-date').innerText = ticket.date;
-        document.getElementById('ticket-id').innerText = ticket.ticketId;
-        generateBarcode(ticket.ticketId);
-    }
-}
-
-function generateBarcode(ticketId) {
-    const barcode = document.getElementById('barcode');
-    JsBarcode(barcode, ticketId, {
-        format: 'CODE128',
-        lineColor: '#000',
-        width: 2,
-        height: 50,
-        displayValue: true
-    });
-}
-
-
-
-
-
-
-//Admin
 document.addEventListener('DOMContentLoaded', () => {
     loadEvents();
     
@@ -55,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function loadEvents() {
-    fetch('TICKETING/events.json')
+    fetch('./events.json')
         .then(response => response.json())
         .then(events => {
             const eventContainer = document.querySelector('.events-container');
@@ -86,22 +42,26 @@ function addEvent() {
         price: parseInt(price)
     };
 
-    fetch('data/events.json')
-        .then(response => response.json())
-        .then(events => {
-            events.push(newEvent);
+    fetch('./events.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newEvent)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert(data.message);
+            document.getElementById('eventForm').reset();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
 
-            return fetch('TICKETING/events.json', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(events)
-            });
-        })
-        .then(() => {
-            alert('Event added successfully!');
-            eventForm.reset();
-        })
-        .catch(error => console.error('Error:', error));
+function purchaseTicket(eventName, eventPrice) {
+    // Add your ticket purchase logic here
+    alert(`Ticket purchased for ${eventName} at $${eventPrice}`);
 }
