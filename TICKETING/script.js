@@ -91,7 +91,7 @@ function addEvent() {
         .then(events => {
             events.push(newEvent);
 
-            return fetch('./events.json', {
+            return fetch('TICKETING/events.json', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
